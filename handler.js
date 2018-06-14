@@ -3,6 +3,8 @@
 const connectToDatabase = require('./db');
 const Planet = require('./models/Planet');
 const swapi = require('swapi-node');
+const Promise = require('bluebird');
+
 require('dotenv').config({ path: './variables.env' });
 
 module.exports.create = (event, context, callback) => {
@@ -60,29 +62,25 @@ module.exports.getAll = (event, context, callback) => {
         console.log(err);
     });*/
 
-    for (var i = 1; i < 10; i++) {
-        swapi.get('http://swapi.co/api/planets/?page=' + i).then((result) => {
-            console.log(result['results']);
-        }).catch((err) => {
-            console.log(err);
-        });
-    }
-
-    connectToDatabase()
-        .then(() => {
-            Planet.find()
-                .then(planets => callback(null, {
-                    statusCode: 200,
-                    body: JSON.stringify(planets)
-                }))
-                .catch(err => callback(null, {
-                    statusCode: err.statusCode || 500,
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
-                    body: 'Could not fetch the planets.'
-                }))
-        });
+    getPlanetNames().then((results) => {
+        console.log("Resultado de getPlanetNames: ", results);
+    }).then(() => {
+        connectToDatabase()
+            .then(() => {
+                Planet.find()
+                    .then(planets => callback(null, {
+                        statusCode: 200,
+                        body: JSON.stringify(planets)
+                    }))
+                    .catch(err => callback(null, {
+                        statusCode: err.statusCode || 500,
+                        headers: {
+                            'Content-Type': 'text/plain'
+                        },
+                        body: 'Could not fetch the planets.'
+                    }))
+            });
+    });
 };
 
 module.exports.update = (event, context, callback) => {
@@ -129,3 +127,31 @@ module.exports.delete = (event, context, callback) => {
                 }));
         });
 };
+
+function getPlanetNames() {
+    var urls = [];
+
+    for (var i = 1; i < 10; i++) {
+        urls.push('http://swapi.co/api/planets/?page=' + i);
+    }
+
+    var planets = [];
+
+    return Promise.map(urls, getPlanets).then((result) => {
+        result.forEach(element => {
+            if (element && element.results) {
+                element.results.forEach(planet => planets.push({ name: planet.name, filmes: planet.films }));
+            };
+        });
+    }).then(() => {
+        return Promise.resolve(planets);
+    });
+}
+
+function getPlanets(url) {
+    return swapi.get(url).then((result) => {
+        return result;
+    }).catch((err) => {
+        console.log(err);
+    });
+}
