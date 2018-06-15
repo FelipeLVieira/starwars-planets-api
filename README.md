@@ -3,7 +3,42 @@
 
 Simple REST API designed to store Star Wars planets, written in Serverless, NodeJS and Mongoose.
 
-## Getting Started
+## Using
+
+You can use an tool like [Postman](https://www.getpostman.com/) to POST new planets.
+The planets sent to API must follow the following JSON format:
+
+```
+{
+    "name": "Alderaan",
+    "climate": "temperate",
+    "terrain": "grasslands, mountains"
+}
+```
+The API will get the movies from the named planet, if exists, and will persist in the database.
+
+You can use the following endpoints with the API:
+
+Create a new planet:
+* POST - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets
+
+Search a planet by id:
+* GET - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/{id}
+
+Search a planet by name:
+* GET - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/name/{name}
+
+Show all planets:
+* GET - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets
+
+Modify a planet by id:
+* PUT - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/{id}
+
+Remove a planet:
+* DELETE - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/{id}
+
+
+## Getting Started Offline
 
 To run this project offline, run the following commands:
 ```
@@ -12,82 +47,22 @@ $ sls offline start --skipCacheInvalidation
 ```
 The API will start running at the default address *http://localhost:3000*.
 
-### Prerequisites
-
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
-
-### Installing
-
-A step by step series of examples that tell you how to get a development env running
-
-Say what the step will be
-
-```
-Give the example
-```
-
-And repeat
-
-```
-until finished
-```
-
-End with an example of getting some data out of the system or using it for a little demo
-
-## Running the tests
-
-Explain how to run the automated tests for this system
-
-### Break down into end to end tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
-### And coding style tests
-
-Explain what these tests test and why
-
-```
-Give an example
-```
-
 ## Deployment
 
-Add additional notes about how to deploy this on a live system
+The service used to host the API was MongoDB Atlas.
+You'll need to create a variables.env file. Then you'll need to create a MongoDB Atlas project, create a free tier cluster, create an user, get the cluester's 3.4 or erlier connection string and finally add to variables.env file, example:
+```
+DB=mongodb://admin:<PASSWORD>@obiwan-shard-00-00-tira4.mongodb.net:27017,obiwan-shard-00-01-tira4.mongodb.net:27017,obiwan-shard-00-02-tira4.mongodb.net:27017/test?ssl=true&replicaSet=Obiwan-shard-0&authSource=admin&retryWrites=true
+```
 
 ## Built With
 
-* [Dropwizard](http://www.dropwizard.io/1.0.2/docs/) - The web framework used
-* [Maven](https://maven.apache.org/) - Dependency Management
-* [ROME](https://rometools.github.io/rome/) - Used to generate RSS Feeds
-
-## Contributing
-
-Please read [CONTRIBUTING.md](https://gist.github.com/PurpleBooth/b24679402957c63ec426) for details on our code of conduct, and the process for submitting pull requests to us.
-
-## Versioning
-
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+* [SWAPI](https://swapi.co/) - Used get planet's films apparitions
 
 ## Authors
 
-* **Billie Thompson** - *Initial work* - [PurpleBooth](https://github.com/PurpleBooth)
-
-See also the list of [contributors](https://github.com/your/project/contributors) who participated in this project.
+* **Felipe Vieira**
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
-
-## Acknowledgments
-
-* Hat tip to anyone whose code was used
-* Inspiration
-* etc
+This project is licensed under the GPL-3.0 License - see the [LICENSE.md](LICENSE.md) file for details
