@@ -1,4 +1,4 @@
-![alt text](https://image.ibb.co/hT5XSy/Star_wars_longshadow_00.jpg "starwars-planets-api")
+![alt text](https://image.ibb.co/d61Wny/Star_wars_longshadow_00.jpg "starwars-planets-api")
 # starwars-planets-api
 
 One Paragraph of project description goes here
