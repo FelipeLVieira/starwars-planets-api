@@ -3,7 +3,37 @@
 
 Simple REST API designed to store Star Wars planets, written in Serverless, NodeJS and Mongoose.
 
-## Getting Started
+## Using
+
+You can use an tool like [Postman](https://www.getpostman.com/) to POST new planets.
+The planets sent to API must follow the following JSON format:
+
+```
+{
+    "name": "Alderaan",
+    "climate": "temperate",
+    "terrain": "grasslands, mountains"
+}
+```
+The API will get the movies from the named planet, if exists, and will persist in the database.
+
+You can use the following endpoints with the API:
+
+Create a new planet:
+* POST - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets
+Search a planet by id:
+* GET - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/{id}
+Search a planet by name:
+* GET - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/name/{name}
+Show all planets:
+* GET - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets
+Modify a planet by id:
+* PUT - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/{id}
+Remove a planet:
+* DELETE - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/{id}
+
+
+## Getting Started Offline
 
 To run this project offline, run the following commands:
 ```
