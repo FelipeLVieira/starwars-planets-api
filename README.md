@@ -1,11 +1,16 @@
 ![alt text](https://image.ibb.co/d61Wny/Star_wars_longshadow_00.jpg "starwars-planets-api")
 # starwars-planets-api
 
-One Paragraph of project description goes here
+Simple REST API designed to store Star Wars planets, written in Serverless, NodeJS and Mongoose.
 
 ## Getting Started
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+To run this project offline, run the following commands:
+```
+$ npm install
+$ sls offline start --skipCacheInvalidation
+```
+The API will start running at the default address *http://localhost:3000*.
 
 ### Prerequisites
 
