@@ -21,14 +21,19 @@ You can use the following endpoints with the API:
 
 Create a new planet:
 * POST - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets
+
 Search a planet by id:
 * GET - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/{id}
+
 Search a planet by name:
 * GET - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/name/{name}
+
 Show all planets:
 * GET - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets
+
 Modify a planet by id:
 * PUT - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/{id}
+
 Remove a planet:
 * DELETE - https://skes7yea77.execute-api.us-east-1.amazonaws.com/dev/planets/{id}
 
