@@ -1,4 +1,4 @@
-[logo]: https://ibb.co/kvhqEd "starwars-planets-api"
+![alt text](https://ibb.co/kvhqEd "starwars-planets-api")
 # starwars-planets-api
 
 One Paragraph of project description goes here
