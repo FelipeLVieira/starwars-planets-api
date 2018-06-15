@@ -4,38 +4,60 @@ const connectToDatabase = require('./db');
 const Planet = require('./models/Planet');
 const swapi = require('swapi-node');
 const Promise = require('bluebird');
-
 require('dotenv').config({ path: './variables.env' });
 
+/*=========================================================================
+| POST - Create a new planet and find its related movies to attach to it. |
+=========================================================================*/
 module.exports.create = (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
 
     connectToDatabase()
         .then(() => {
-            Planet.create(JSON.parse(event.body))
-                .then(planet => callback(null, {
-                    statusCode: 200,
-                    body: JSON.stringify(planet)
-                }))
-                .catch(err => callback(null, {
-                    statusCode: err.statusCode || 500,
-                    headers: {
-                        'Content-Type': 'text/plain'
-                    },
-                    body: 'Could not create the planet.'
-                }));
+            //Get planet's name
+            getPlanetMovies(JSON.parse(event.body).name)
+                .then((planetMovies) => {
+                    //console.log('event body', event.body);
+                    var newPlanet = JSON.parse(event.body);
+                    //Add found movies to the planet
+                    newPlanet.films = planetMovies;
+                    //Persist the planet
+                    Planet.create(newPlanet)
+                        .then(planet => callback(null, {
+                            statusCode: 200,
+                            body: JSON.stringify(planet)
+                        }))
+                        .catch(err => callback(null, {
+                            statusCode: err.statusCode || 500,
+                            headers: {
+                                'Content-Type': 'text/plain'
+                            },
+                            body: 'Could not create the planet.'
+                        }));
+                });
         });
 };
 
+/*===================================
+| GET - Find a planet by id or name |
+===================================*/
 module.exports.getOne = (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
 
     connectToDatabase()
         .then(() => {
-            Planet.findById(event.pathParameters.id)
+            Planet.findOne({
+                    $or: [{
+                            _id: event.pathParameters.id
+                        },
+                        {
+                            name: event.pathParameters.name
+                        }
+                    ]
+                })
                 .then(planet => callback(null, {
                     statusCode: 200,
-                    body: JSON.stringify(planet)
+                    body: JSON.stringify(planet, null, 4)
                 }))
                 .catch(err => callback(null, {
                     statusCode: err.statusCode || 500,
@@ -47,42 +69,32 @@ module.exports.getOne = (event, context, callback) => {
         });
 };
 
+/*=======================
+| GET - Get all planets |
+=======================*/
 module.exports.getAll = (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
 
-    /*swapi.get('http://swapi.co/api/planets/?search=tatooine').then((result) => {
-        console.log(result);
-        return result.nextPage();
-    }).then((result) => {
-        console.log(result);
-        return result.previousPage();
-    }).then((result) => {
-        console.log(result);
-    }).catch((err) => {
-        console.log(err);
-    });*/
-
-    getPlanetNames().then((results) => {
-        console.log("Resultado de getPlanetNames: ", results);
-    }).then(() => {
-        connectToDatabase()
-            .then(() => {
-                Planet.find()
-                    .then(planets => callback(null, {
-                        statusCode: 200,
-                        body: JSON.stringify(planets)
-                    }))
-                    .catch(err => callback(null, {
-                        statusCode: err.statusCode || 500,
-                        headers: {
-                            'Content-Type': 'text/plain'
-                        },
-                        body: 'Could not fetch the planets.'
-                    }))
-            });
-    });
+    connectToDatabase()
+        .then(() => {
+            Planet.find()
+                .then(planets => callback(null, {
+                    statusCode: 200,
+                    body: JSON.stringify(planets, null, 4)
+                }))
+                .catch(err => callback(null, {
+                    statusCode: err.statusCode || 500,
+                    headers: {
+                        'Content-Type': 'text/plain'
+                    },
+                    body: 'Could not fetch the planets.'
+                }))
+        });
 };
 
+/*=======================
+| Update a planet by ID |
+=======================*/
 module.exports.update = (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
 
@@ -93,7 +105,7 @@ module.exports.update = (event, context, callback) => {
                 })
                 .then(planet => callback(null, {
                     statusCode: 200,
-                    body: JSON.stringify(planet)
+                    body: JSON.stringify(planet, null, 4)
                 }))
                 .catch(err => callback(null, {
                     statusCode: err.statusCode || 500,
@@ -105,6 +117,9 @@ module.exports.update = (event, context, callback) => {
         });
 };
 
+/*=======================
+| Delete a planet by ID |
+=======================*/
 module.exports.delete = (event, context, callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
 
@@ -114,9 +129,9 @@ module.exports.delete = (event, context, callback) => {
                 .then(planet => callback(null, {
                     statusCode: 200,
                     body: JSON.stringify({
-                        message: 'Removed planet with id: ' + planet._id,
+                        message: 'Removed planet with id: ' + planet.id,
                         planet: planet
-                    })
+                    }, null, 4)
                 }))
                 .catch(err => callback(null, {
                     statusCode: err.statusCode || 500,
@@ -128,7 +143,9 @@ module.exports.delete = (event, context, callback) => {
         });
 };
 
-function getPlanetNames() {
+
+// Fetch SWAPI looking for a planet with the given name and find its related movies
+function getPlanetMovies(planetName) {
     var urls = [];
 
     for (var i = 1; i < 10; i++) {
@@ -137,18 +154,25 @@ function getPlanetNames() {
 
     var planets = [];
 
-    return Promise.map(urls, getPlanets).then((result) => {
+    return Promise.map(urls, getPlanetsByURL).then((result) => {
         result.forEach(element => {
             if (element && element.results) {
-                element.results.forEach(planet => planets.push({ name: planet.name, filmes: planet.films }));
-            };
+                element.results.forEach(planet => {
+                    console.log(planet);
+                    if (planet.name == planetName) {
+
+                        planets.push(planet.films);
+                    }
+                });
+            }
         });
     }).then(() => {
         return Promise.resolve(planets);
     });
 }
 
-function getPlanets(url) {
+// Given a url, returns a promise with a JSON object
+function getPlanetsByURL(url) {
     return swapi.get(url).then((result) => {
         return result;
     }).catch((err) => {

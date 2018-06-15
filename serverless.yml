@@ -20,7 +20,11 @@ functions:
     handler: handler.getOne
     events:
       - http:
-          path: planets/{id}
+          path: planets/{id} 
+          method: get
+          cors: true
+      - http:
+          path: planets/name/{name}
           method: get
           cors: true
   getAll:

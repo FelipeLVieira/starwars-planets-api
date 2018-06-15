@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const PlanetSchema = new mongoose.Schema({
-    nome: String,
-    clima: String,
-    terreno: String,
-    films: []
+    name: String,
+    climate: String,
+    terrain: String,
+    films: Array
 });
 module.exports = mongoose.model('Planet', PlanetSchema);
